@@ -1,18 +1,8 @@
 #include <stdint.h> 
 #include <stdio.h> 
-// simple macro for loops
-#define LOOP(n) for(i=0;i<n;++i)
-
-// macro definition for runction W
-// this function returns n-th element of the vector v
-// which is a pointer to uint64
+#define LOOP(n) for(i=0;i<n;++i) 
 #define W(v,n) ((uint64_t*)v)[n]
-
-// macro definition for function R
-// this function shifts the vector v 64-n times to left
-// and takes a bitwise or with the vector v shifted n times to right
 #define R(v,n)(((v)<<(64-n))|((v)>>n)) 
-
 #define AXR(a,b,c,r) x[a]+=x[b];x[c]=R(x[c]^x[a],r); 
 #define G(a,b,c,d) {AXR(a,b,d,32) AXR(c,d,b,25) AXR(a,b,d,16) AXR(c,d,b,11)} 
 #define ROUNDS {for(r=6;r--;){LOOP(4) G(i,i+4,i+8,i+12) \
