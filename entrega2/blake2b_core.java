@@ -1,5 +1,5 @@
 
-import java.math.*;
+import java.math.BigInteger;
 import java.util.*;
 
 
@@ -10,12 +10,22 @@ public class blake2b_core
 	private int _bufferFilled;
 	private byte[] _buf = new byte[128];
 
+	// Message
 	private BigInteger[] _m = new BigInteger[16];
+	
+	// Hash
 	private BigInteger[] _h = new BigInteger[8];
+	
+	// Counters
 	private BigInteger _t0;
 	private BigInteger _t1;
+	
+	// Finalisation flags
 	private BigInteger _f0;
 	private BigInteger _f1;
+	
+	// Internal state
+	private BigInteger[] v = new BigInteger[16];
 
 	private final int BlockSizeInBytes = 128;
 	
@@ -48,17 +58,34 @@ public class blake2b_core
 		};
 	
 	
+	// TODO
+	private BigInteger BytesToUInt64 ( byte[] block, int start )
+	{
+		BigInteger k = new BigInteger ( block );
+		
+		return k;
+
+	}
+	
+	
+	private void UInt64ToBytes ( BigInteger h, byte[] block, int start )
+	{
+		block = h.toByteArray();
+
+	}
+	
+	
 	// Initialises
-	private void Initialise ( BigInteger[] P ) throws Exception
+	public void Initialise ( BigInteger[] P ) throws Exception
 	{
 		if ( P == null )
 		{
-			throw new Exception("config");
+			throw new Exception ( "config" );
 		}
 		
 		if ( P.length != 8 )
 		{
-			throw new Exception("config length must be 8 words");
+			throw new Exception ( "config length must be 8 words" );
 		}
 		
 		
@@ -74,7 +101,10 @@ public class blake2b_core
 
 		// h = IV
 		BigInteger[] _h = { IV[0], IV[1], IV[2], IV[3], IV[4], IV[5], IV[6], IV[7] };
-				
+		
+
+		Arrays.fill ( _buf, ( byte ) 0 );
+		
 		// h = h xor P
 		for ( int i = 0; i < 8; i++ )
 		{
@@ -127,7 +157,6 @@ public class blake2b_core
 	}
 	
 	// Compression method
-	// TODO
 	private void Compress ( byte[] block, int start )
 	{
 		for ( int i = 0; i < 16; i++ )
@@ -136,7 +165,6 @@ public class blake2b_core
 
 		}
 		
-		BigInteger[] v = new BigInteger[16];
 		
 		v[0] = _h[0];
 		v[1] = _h[1];
@@ -174,25 +202,25 @@ public class blake2b_core
 
 	public void HashCore ( byte[] array, int start, int count ) throws Exception
 	{
-		if (!_isInitialised)
+		if ( !_isInitialised )
 		{
-			throw new Exception ("Not initialized");
+			throw new Exception ( "Not initialized" );
 			
 		}
 		
-		if (array == null)
+		if ( array == null )
 		{
 			throw new Exception ( "array" );
 			
 		}
 		
-		if (start < 0)
+		if ( start < 0 )
 		{
 			throw new Exception ( "start" );
 		
 		}
 		
-		if (count < 0)
+		if ( count < 0 )
 		{
 			throw new Exception ( "count" );
 		
@@ -227,6 +255,7 @@ public class blake2b_core
 			count -= bufferRemaining;
 			
 			_bufferFilled = 0;
+			
 		}
 
 		while ( count > BlockSizeInBytes )
@@ -244,6 +273,7 @@ public class blake2b_core
 			offset += BlockSizeInBytes;
 			
 			count -= BlockSizeInBytes;
+			
 		}
 
 		if ( count > 0 )
@@ -251,12 +281,12 @@ public class blake2b_core
 			System.arraycopy ( array, offset, _buf, _bufferFilled, count );
 			
 			_bufferFilled += count;
+			
 		}
 	}
 	
 	
-	// TODO
-	public byte[] HashFinal ( boolean isEndOfLayer )
+	public byte[] HashFinal ( boolean isEndOfLayer ) throws Exception
 	{
 		if ( !_isInitialised )
 		{
