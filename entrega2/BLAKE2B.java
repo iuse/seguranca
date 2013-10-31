@@ -48,7 +48,7 @@ public class BLAKE2B
 	private static BigInteger[] v = new BigInteger[16];
 	
 	// IV
-	public static final BigInteger[] IV =
+	private static final BigInteger[] IV =
 		{
 			new BigInteger ( "6a09e667f3bcc908", 16 ),
 			new BigInteger ( "bb67ae8584caa73b", 16 ),
@@ -79,7 +79,6 @@ public class BLAKE2B
 	
 	
 	// Initialise hash
-	// TODO
 	public static void Initialise ()
 	{
 		// Set counters and flags
@@ -106,6 +105,7 @@ public class BLAKE2B
 		// TODO
 		
 		
+		/*
 		// Prints h
 		for ( int k = 0; k < 8; k++ )
 		{
@@ -114,6 +114,7 @@ public class BLAKE2B
 		}
 		
 		System.out.print ( "\n" );
+		*/
 		
 	}
 	
@@ -276,8 +277,7 @@ public class BLAKE2B
 	}
 	
 	// Hash function
-	// TODO: Set flags and counters
-	public static void Hash ( String m ) throws Exception
+	public static BigInteger Hash ( String m ) throws Exception
 	{
 		if ( !_isInitialised )
 		{
@@ -317,9 +317,24 @@ public class BLAKE2B
 		{
 			Compress ( _m_blocks[k] );
 			
+			// Increments counter
+			_t0 = _t0.add ( new BigInteger ( "128" ) );
+
+			// TODO: Adjust counter boundaries ( 64 bits )
+			
+			
+			if ( k == N - 1 )
+			{
+				// Sets flag to 0xF...FF if it's the last block processed
+				_f0 = new BigInteger ( "FFFFFFFFFFFFFFFF", 16 );
+				_f1 = new BigInteger ( "FFFFFFFFFFFFFFFF", 16 );
+				
+			}
+			
 		}
 		
-			
+		
+		/*
 		// Prints hashed message
 		System.out.println ( "\nHashed message: " );
 		
@@ -328,9 +343,22 @@ public class BLAKE2B
 			System.out.print ( _h[k] );
 			
 		}
+		*/
+		
 		
 		// Allocate to variable and return
-		// TODO
+		String hash = "";
+
+		for ( int k = 0; k < 8; k++ )
+		{
+			hash += _h[k].toString ();
+		}
+		
+		
+		//System.out.println ( "\nHashed message:\n" + hash );
+		
+		
+		return new BigInteger ( hash );
 		
 	}
 	
