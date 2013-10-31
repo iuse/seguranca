@@ -1,5 +1,15 @@
+/**
+ * Escola Politecnica da USP
+ * PCS2582 - Seguranca da Informacao
+ * 
+ * Coursework #2: BLAKE2B and Schnorr Algorithms implementation
+ * 
+ * @author Andre Hashimoto Oku
+ * @author Soon Hyung Kwon
+ * 
+ */
 
-import java.io.UnsupportedEncodingException;
+
 import java.math.BigInteger;
 import java.util.*;
 
@@ -18,9 +28,6 @@ public class BLAKE2B
 	
 	// Parameter block
 	private static byte[] P = new byte[64];
-	
-	// Message as string
-	private static String _m_string;
 	
 	// Message blocks
 	// Max of 1024 blocks of 128 bytes each
@@ -256,6 +263,7 @@ public class BLAKE2B
 		}
 		
 		
+		/*
 		System.out.println ( "\nPartial hash: " );
 		
 		for ( int i = 0; i < 8; i++ )
@@ -263,15 +271,18 @@ public class BLAKE2B
 			System.out.print ( _h[i] );
 			
 		}
+		*/
 		
 	}
 	
 	// Hash function
-	// TODO
-	public static void Hash ( String m ) throws UnsupportedEncodingException
+	// TODO: Set flags and counters
+	public static void Hash ( String m ) throws Exception
 	{
-		// Message
-		_m_string = m;
+		if ( !_isInitialised )
+		{
+			throw new Exception ( "Not initialised" );
+		}
 		
 		// Converts message into array of bytes
 		byte[] m_array = m.getBytes ( "US-ASCII" );
@@ -318,12 +329,9 @@ public class BLAKE2B
 			
 		}
 		
-		// Allocate to a variable
+		// Allocate to variable and return
 		// TODO
 		
-		
-		//return hash;		
-				
 	}
 	
 }

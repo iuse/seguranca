@@ -1,9 +1,26 @@
+/**
+ * Escola Politecnica da USP
+ * PCS2582 - Seguranca da Informacao
+ * 
+ * Coursework #2: BLAKE2B and Schnorr Algorithms implementation
+ * 
+ * @author Andre Hashimoto Oku
+ * @author Soon Hyung Kwon
+ * 
+ */
+
 
 import java.math.*;
 
 
 public class schnorr
 {
+	// Constructor
+	public schnorr ()
+	{
+		
+	}
+	
 	// Private key
 	private BigInteger _x;
 	
@@ -45,7 +62,7 @@ public class schnorr
 	}
 	
 	
-	// Generate key pair
+	// Generates key pair
 	private void keyPairGen ( BigInteger h )
 	{
 		_x = h.mod ( _q );
@@ -55,7 +72,7 @@ public class schnorr
 	}
 	
 	
-	// Generate signature
+	// Generates signature
 	// TODO
 	private void sign ()
 	{
@@ -67,10 +84,16 @@ public class schnorr
 		σ = (h, s)
 		*/
 		
+		/*
+		BLAKE2B _xm = new BLAKE2B ();
+		_xm.Initialise();
+		_xm.Hash ( xm );
+		*/
+		
 	}
 	
 	
-	// Verify signature
+	// Verifies signature
 	// TODO
 	private void verify ()
 	{

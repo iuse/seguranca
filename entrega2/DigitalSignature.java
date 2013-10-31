@@ -1,6 +1,13 @@
-
-import java.math.BigInteger;
-import java.util.Arrays;
+/**
+ * Escola Politecnica da USP
+ * PCS2582 - Seguranca da Informacao
+ * 
+ * Coursework #2: BLAKE2B and Schnorr Algorithms implementation
+ * 
+ * @author Andre Hashimoto Oku
+ * @author Soon Hyung Kwon
+ * 
+ */
 
 
 public class DigitalSignature
