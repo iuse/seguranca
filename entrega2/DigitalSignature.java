@@ -32,7 +32,7 @@ public class DigitalSignature
 		
 		System.out.println ( "Password:\n" + pw );
 		
-		// Sets Schnorr parameter
+		// Sets Schnorr parameters
 		schnorr.set_par ();
 		
 		// Generates key pair
@@ -40,6 +40,9 @@ public class DigitalSignature
 		
 		// Signs message
 		schnorr.sign ( m );
+		
+		// Verifies message
+		//boolean valid = schnorr.verify ( m );
 		
 	}
 

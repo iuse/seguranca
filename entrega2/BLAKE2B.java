@@ -279,13 +279,18 @@ public class BLAKE2B
 	// Hash function
 	public static BigInteger Hash ( String m ) throws Exception
 	{
+		// Initialises hash parameters
+		Initialise ();
+		
+		
 		if ( !_isInitialised )
 		{
 			throw new Exception ( "Not initialised" );
 		}
 		
+		
 		// Converts message into array of bytes
-		byte[] m_array = m.getBytes ( "US-ASCII" );
+		byte[] m_array = m.getBytes ();
 		
 		// Number of message blocks
 		int N = m_array.length / 128;
@@ -356,6 +361,10 @@ public class BLAKE2B
 		
 		
 		//System.out.println ( "\nHashed message:\n" + hash );
+		
+
+		// Sets initialisation flag to false
+		_isInitialised = false;
 		
 		
 		return new BigInteger ( hash );

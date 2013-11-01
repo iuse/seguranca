@@ -33,6 +33,9 @@ public class schnorr
 	// Signature
 	private static BigInteger[] signature = new BigInteger[2];
 	
+	// Null byte
+	private static final byte[] zero = new byte[1];
+	
 
 	// Sets parameters
 	public static void set_par ()
@@ -82,8 +85,7 @@ public class schnorr
 	// Generates key pair
 	public static void keyPairGen ( String pw ) throws Exception
 	{
-		BLAKE2B.Initialise ();
-		
+		// Hashes password
 		BigInteger hash = BLAKE2B.Hash ( pw );
 		
 		_x = hash.mod ( _q );
@@ -98,20 +100,20 @@ public class schnorr
 	{
 		// Converts x and m to byte array and concatenate
 		byte[] x_array = _x.toByteArray ();
-		byte[] m_array = _m.getBytes ( "US-ASCII" );
+		byte[] m_array = _m.getBytes ();
 		
-		byte[] xm = new byte [x_array.length + m_array.length];
-		System.arraycopy ( x_array, 0, xm, 0, x_array.length );
-		System.arraycopy ( m_array, 0, xm, x_array.length, m_array.length);
+		byte[] xm_aux = new byte [x_array.length + m_array.length];
+		System.arraycopy ( x_array, 0, xm_aux, 0, x_array.length );
+		System.arraycopy ( m_array, 0, xm_aux, x_array.length, m_array.length );
+		byte[] xm = new byte [1 + xm_aux.length];
+		System.arraycopy ( zero, 0, xm, 0, 1 );
+		System.arraycopy ( xm_aux, 0, xm, 1, xm_aux.length );
 		
 		// Converts ( x || m ) to string
-		String xm_string = new String ( xm, "UTF-8" );
+		String xm_string = xm.toString ();
 
 		//System.out.println ( xm_string );
-		
-		// Initialises hash function
-		BLAKE2B.Initialise();
-		
+			
 		// Hashes xm
 		// BLAKE2b ( x || m )
 		BigInteger k = BLAKE2B.Hash ( xm_string );
@@ -122,20 +124,25 @@ public class schnorr
 		// u = g^k mod p
 		BigInteger u = _g.modPow ( k, _p );
 		
+		
+		//System.out.println ( "u == " + u );
+		//System.out.println ( "u == " + String.format ( "%040x", u ) );
+		
+		
 		// Converts m and u to byte array and concatenate
 		byte[] u_array = u.toByteArray ();
 				
-		byte[] mu = new byte [m_array.length + u_array.length];
-		System.arraycopy ( m_array, 0, mu, 0, m_array.length );
-		System.arraycopy ( u_array, 0, mu, m_array.length, u_array.length);
+		byte[] mu_aux = new byte [m_array.length + u_array.length];
+		System.arraycopy ( m_array, 0, mu_aux, 0, m_array.length );
+		System.arraycopy ( u_array, 0, mu_aux, m_array.length, u_array.length );
+		byte[] mu = new byte [1 + mu_aux.length];
+		System.arraycopy ( zero, 0, mu, 0, 1 );
+		System.arraycopy ( mu_aux, 0, mu, 1, mu_aux.length );
 		
 		// Converts ( m || u ) to string
-		String mu_string = new String ( mu, "UTF-8" );
-		
-		// Initialises hash function
-		BLAKE2B.Initialise();
+		String mu_string = mu.toString ();
 			
-		// Hashes xm
+		// Hashes mu
 		// h = BLAKE2b ( m || u )
 		BigInteger h = BLAKE2B.Hash ( mu_string );
 		
@@ -148,27 +155,67 @@ public class schnorr
 		signature[0] = h;
 		signature[1] = s;
 		
+		/*
 		System.out.println ( "h == " + signature[0] );
 		System.out.println ( "s == " + signature[1] );
+		*/
 		
 	}
 	
 	
 	// Verifies signature
-	// TODO
-	public static boolean verify ()
+	public static boolean verify ( String m ) throws Exception
 	{
+		
+		// u = g^s * y^h ( mod p )
+		BigInteger u = _g.modPow ( signature[1], _p );
+        BigInteger aux = _y.modPow ( signature[0], _p );
+        u = u.multiply ( aux ).mod ( _p );
+
+
+        //System.out.println ( "u == " + u );
+        //System.out.println ( "u == " + String.format ( "%040x", u ) );
+		
+       
+		// Converts m and u to byte array and concatenate
+        byte[] m_array = m.getBytes ();
+        byte[] u_array = u.toByteArray ();
+				
+		byte[] mu_aux = new byte [m_array.length + u_array.length];
+		System.arraycopy ( m_array, 0, mu_aux, 0, m_array.length );
+		System.arraycopy ( u_array, 0, mu_aux, m_array.length, u_array.length );
+		byte[] mu = new byte [1 + mu_aux.length];
+		System.arraycopy ( zero, 0, mu, 0, 1 );
+		System.arraycopy ( mu_aux, 0, mu, 1, mu_aux.length );
+		
+		// Converts ( m || u ) to string
+		String mu_string = mu.toString ();
+		
+		// Hashes mu
+		// h = BLAKE2b ( m || u )
+		BigInteger h = BLAKE2B.Hash ( mu_string );
+		
 		/*
-		u = ( g^s * y^h ) mod p
-		aceitar <=> BLAKE2b ( m || u ) == h
+		System.out.println ( "h == " + h );
+		System.out.println ( "h == " + signature[0] );
 		*/
 		
-		// u = ( g^s * y^h ) mod p
+		/*
+		System.out.println ( "h == " + String.format ( "%040x", h ) );
+		System.out.println ( "h == " + String.format ( "%040x", signature[0] ) );
+		*/
+				
 		
-		// BLAKE2b ( m || u )
-		
-
-		return false;
+		if ( h.equals ( signature[0] ) )
+		{
+			return true;
+			
+		}
+		else
+		{
+			return false;
+					
+		}
 		
 	}
 
