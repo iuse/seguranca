@@ -40,7 +40,7 @@ public class CramerShoup
 	
 	
 	// Generates key pair
-	public void keyPairGen ( String pw )
+	public BigInteger[] keyPairGen ( String pw )
 	{
 		// Null byte
 		byte[] zero = new byte[1];
@@ -87,6 +87,9 @@ public class CramerShoup
 		// h = g1^z mod p
 		h = g1.modPow ( z, p );
 		
+		
+		return new BigInteger[] { c, d, h };
+		
 	}
 	
 	
@@ -98,11 +101,11 @@ public class CramerShoup
 		
 		
 		// Public key
-		BigInteger c = pk[0];
-        BigInteger d = pk[1];
-        BigInteger h = pk[2];
+		BigInteger c1 = pk[0];
+        BigInteger d1 = pk[1];
+        BigInteger h1 = pk[2];
 
-        
+
 		// r = random mod q
         Random rnd = new Random ();
 		BigInteger r = new BigInteger ( 256, rnd );
@@ -116,7 +119,7 @@ public class CramerShoup
 		
 		// e = h^r k mod p
 		BigInteger K = new BigInteger ( Utility.append ( zero, k ) );
-		BigInteger hr = h.modPow ( r, p );
+		BigInteger hr = h1.modPow ( r, p );
 		BigInteger e = hr.multiply ( K ).mod ( p );
 		
 		// alpha = Blake2b ( u1 || u2 || e )
@@ -127,8 +130,8 @@ public class CramerShoup
 		
 		// v = c^r d^(r*alpha) mod p
 		BigInteger ra = a.multiply ( r );
-		BigInteger cr = c.modPow ( r, p );
-		BigInteger dra = d.modPow ( ra, p );
+		BigInteger cr = c1.modPow ( r, p );
+		BigInteger dra = d1.modPow ( ra, p );
 		BigInteger v = cr.multiply ( dra ).mod ( p );
 		
 		
@@ -150,6 +153,7 @@ public class CramerShoup
 		BigInteger e = C[2];
 		BigInteger v = C[3];
 		
+		
 		// alpha = Blake2b ( u1 || u2 || e )
 		byte[] u1u2 = Utility.append ( u1.toByteArray (), u2.toByteArray () );
 		byte[] alpha = Utility.append ( u1u2, e.toByteArray () );
@@ -167,6 +171,7 @@ public class CramerShoup
 		
 		if ( v1.equals ( v ) )
 		{
+			//System.out.println ( "equal" );
 						
 		}
 		else
