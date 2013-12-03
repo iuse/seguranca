@@ -176,6 +176,8 @@ public class CramerShoup
 		}
 		else
 		{
+			System.out.println ( "Error" );
+			
 			return zero;
 
 		}

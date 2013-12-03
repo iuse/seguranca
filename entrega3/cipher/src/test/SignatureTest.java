@@ -32,7 +32,7 @@ public class SignatureTest
 		ds.update ( m );
 		
 		// Generates key pair
-		ds.keyPairGen ( pw );
+		BigInteger key = ds.keyPairGen ( pw );
 		
 		// Signs message
 		BigInteger[] sigma = ds.sign ();
@@ -44,7 +44,7 @@ public class SignatureTest
 		ds.update( m );
 		
 		// Verifies message
-		boolean valid = ds.verify ( sigma );
+		boolean valid = ds.verify ( sigma, key );
 		
 		System.out.println ( valid );
 		

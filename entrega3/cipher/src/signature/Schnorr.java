@@ -43,7 +43,7 @@ public class Schnorr
 	
 	
 	// Generates key pair
-	public void keyPairGen ( String pw )
+	public BigInteger keyPairGen ( String pw )
 	{
 		// Null byte
 		byte[] zero = new byte[1];
@@ -59,6 +59,9 @@ public class Schnorr
 		// Public key
 		// y = g^x mod p
 		y = g.modPow ( x, p );
+		
+		
+		return y;
 		
 	}
 	
@@ -93,7 +96,7 @@ public class Schnorr
 	
 	
 	// Verify
-	public boolean verify ( BigInteger[] sigma )
+	public boolean verify ( BigInteger[] sigma, BigInteger key )
 	{
 		// Null byte
 		byte[] zero = new byte[1];
@@ -104,7 +107,7 @@ public class Schnorr
 		
 		// u = g^s y^h mod p
 		BigInteger gs = g.modPow ( s, p );
-		BigInteger yh = y.modPow ( h, p );
+		BigInteger yh = key.modPow ( h, p );
 		BigInteger u = gs.multiply ( yh ).mod ( p );
 		
 		// Accept <=> Blake2b ( m || u ) == h
