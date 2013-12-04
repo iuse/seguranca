@@ -5,7 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * Tweetcypher Version 3
+ * Tweetcipher Version 3
  * 
  * Escola Politecnica da USP
  * PCS2582 - Seguranca da Informacao
@@ -115,13 +115,33 @@ public class Tweetcipher {
 			
 			while ((inChar = input.read()) != -1) {
 				// If deciphering then read one more character
-				if(!m) inChar = Integer.parseInt(Character.toString((char)inChar)+Character.toString((char)input.read()),16);
+				if ( !m )
+				{
+					inChar = Integer.parseInt(Character.toString((char)inChar)+Character.toString((char)input.read()),16);
+			
+				}
 				
 				// if decoding then all the bytes except the last one must be 0
 				tempChar = m ? inChar : inChar & mask;
 				
-				if(m) output.write(Integer.toHexString((int)((x[0] ^ tempChar) & mask)));
-				else output.write((int)((x[0] ^ tempChar) & mask));
+				if ( m )
+				{
+					String s = Integer.toHexString((int)((x[0] ^ tempChar) & mask));
+					
+					if ( s.length () == 1 )
+					{
+						output.write( "0" );
+					}
+					
+					output.write( s );
+					
+				}
+				else
+				{
+					output.write((int)((x[0] ^ tempChar) & mask));
+					
+				}
+				
 				x[0] = tempChar ^ (m ? x[0] : x[0] & ~255);
 	
 				rounds(x);

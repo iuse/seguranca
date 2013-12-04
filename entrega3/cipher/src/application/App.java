@@ -2,12 +2,18 @@
 package application;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
+import java.util.Random;
 
 import asymCipher.CramerShoup;
 import signature.Schnorr;
+import tweetcipher.Tweetcipher;
 
 
 public class App
@@ -54,7 +60,7 @@ public class App
 	}
 	
 	
-	private static void keyParGen ()
+	private static void keyParGen () throws IOException
 	{
 		CramerShoup user = new CramerShoup ();
 		
@@ -63,7 +69,7 @@ public class App
 		
 		
 		// Sets user password
-		System.out.println ( "Digite uma senha:" );
+		System.out.println ( "Digite a senha:" );
 		System.out.print ( "> " );
 		
 		BufferedReader input = new BufferedReader ( new InputStreamReader ( System.in ) );
@@ -90,19 +96,232 @@ public class App
 		System.out.println ( "d:" + pk[1].toString ( 16 ) );
 		System.out.println ( "h:" + pk[2].toString ( 16 ) );
 		
-	}
-	
-	
-	// TODO
-	private static void encryptFile ()
-	{
+		
+		// Generates text file with public key
+		FileWriter key = new FileWriter ( "pk.txt" );
+		
+		key.write ( pk[0].toString ( 16 ) + "\n" );
+		key.write ( pk[1].toString ( 16 ) + "\n" );
+		key.write ( pk[2].toString ( 16 ) );
+		
+		key.close ();
 		
 	}
 	
 	
-	// TODO
-	private static void decryptFile ()
+	private static void encryptFile () throws IOException
 	{
+		System.out.println ( "Digite o nome do arquivo a ser encriptado:" );
+		System.out.print ( "> " );
+		
+		BufferedReader input = new BufferedReader ( new InputStreamReader ( System.in ) );
+		
+		String fileIn = new String ();
+		
+		try
+		{
+			fileIn = input.readLine ();
+			
+		}
+		catch ( Exception e )
+		{
+			
+		}
+		
+		
+		System.out.println ( "\nDigite o nome do arquivo que contém a chave pública do remetente:" );
+		System.out.print ( "> " );
+		
+		input = new BufferedReader ( new InputStreamReader ( System.in ) );
+		
+		String rpkFile = new String();
+		
+		try
+		{
+			rpkFile = input.readLine ();
+			
+		}
+		catch ( Exception e )
+		{
+			
+		}
+				
+		
+		// Generates symmetric key
+        Random rnd = new Random ();
+		BigInteger key = new BigInteger ( 256, rnd );
+		key = key.mod ( q );
+		
+		
+		// Generates nonce
+        rnd = new Random ();
+		BigInteger nonce = new BigInteger ( 128, rnd );
+				
+		
+		// Opens files
+		// Contains recipient public key
+		FileInputStream rpk = new FileInputStream ( rpkFile );
+
+		// Contains ciphertext
+		FileWriter ct = new FileWriter ( fileIn + "_ciphertext.txt" );
+		
+		
+		// Encrypt file
+		Tweetcipher tc = new Tweetcipher ( key.toString ( 16 ), nonce.toString ( 16 ) );
+		
+		tc.encdec ( fileIn, fileIn + "_ciphered.txt", 'e' );
+		
+		
+		// Encrypts symmetric key
+		CramerShoup user = new CramerShoup ();
+		
+		user.config ( p, q, g, g1, g2 );
+		
+		BigInteger[] pk = new BigInteger[3];
+		
+		BufferedReader rpkBuffer = new BufferedReader ( new InputStreamReader ( rpk ) );
+		
+		String rpkLine;
+		
+		for ( int k = 0; ( rpkLine = rpkBuffer.readLine () ) != null; k++ )
+		{
+			pk[k] = new BigInteger ( rpkLine, 16 );
+			
+			//System.out.println ( pk[k].toString ( 16 ) );
+		
+		}
+		
+		BigInteger[] s = user.encrypt ( pk, key.toByteArray () );
+		
+		ct.write ( s[0].toString ( 16 ) + "\n" );
+		ct.write ( s[1].toString ( 16 ) + "\n" );
+		ct.write ( s[2].toString ( 16 ) + "\n" );
+		ct.write ( s[3].toString ( 16 ) + "\n" );
+		ct.write ( nonce.toString ( 16 ) );
+		
+		
+		// Closes files
+		rpk.close ();
+		ct.close ();
+		
+	}
+	
+	
+	private static void decryptFile () throws IOException
+	{
+		System.out.println ( "Digite o nome do arquivo a ser decriptado:" );
+		System.out.print ( "> " );
+		
+		BufferedReader input = new BufferedReader ( new InputStreamReader ( System.in ) );
+		
+		String fileIn = new String ();
+		
+		try
+		{
+			fileIn = input.readLine ();
+			
+		}
+		catch ( Exception e )
+		{
+			
+		}
+		
+		
+		System.out.println ( "\nDigite o nome do arquivo de saída:" );
+		System.out.print ( "> " );
+		
+		input = new BufferedReader ( new InputStreamReader ( System.in ) );
+		
+		String fileOut = new String();
+		
+		try
+		{
+			fileOut = input.readLine ();
+			
+		}
+		catch ( Exception e )
+		{
+			
+		}
+		
+		
+		System.out.println ( "\nDigite o nome do arquivo que contém o criptograma:" );
+		System.out.print ( "> " );
+		
+		input = new BufferedReader ( new InputStreamReader ( System.in ) );
+		
+		String ctFile = new String();
+		
+		try
+		{
+			ctFile = input.readLine ();
+			
+		}
+		catch ( Exception e )
+		{
+			
+		}
+		
+		
+		System.out.println ( "\nDigite a senha:" );
+		System.out.print ( "> " );
+		
+		input = new BufferedReader ( new InputStreamReader ( System.in ) );
+		
+		String pw = new String();
+		
+		try
+		{
+			pw = input.readLine ();
+			
+		}
+		catch ( Exception e )
+		{
+			
+		}
+		
+		
+		// Opens files
+		// Contains ciphertext
+		FileInputStream ct = new FileInputStream ( ctFile );
+		
+		
+		// Reads ciphertext file
+		BigInteger[] c = new BigInteger[5];
+
+		BufferedReader ctBuffer = new BufferedReader ( new InputStreamReader ( ct ) );
+		
+		String ctLine;
+		
+		for ( int k = 0; ( ctLine = ctBuffer.readLine () ) != null; k++ )
+		{
+			c[k] = new BigInteger ( ctLine, 16 );
+			
+			// System.out.println ( c[k].toString ( 16 ) );
+		
+		}
+		
+		
+		// Decrypts symmetric key
+		CramerShoup user = new CramerShoup ();
+		
+		user.config ( p, q, g, g1, g2 );
+		
+		BigInteger[] user_pk = user.keyPairGen ( pw );
+		
+		byte[] k = user.decrypt ( c );
+		
+		BigInteger kHex = new BigInteger ( k );
+		
+		
+		// Decrypts file
+		Tweetcipher tc = new Tweetcipher ( kHex.toString ( 16 ), c[4].toString ( 16 ) );
+		
+		tc.encdec ( fileIn, fileOut, 'd' );
+		
+		
+		// Closes files
+		ct.close ();
 		
 	}
 	
@@ -270,9 +489,115 @@ public class App
 	}
 	
 	
-	// TODO
-	private static void tc ()
+	private static void tc () throws IOException
 	{
+		System.out.println ( "Selecione o modo ('e' para encriptar, 'd' para decriptar):" );
+		System.out.print ( "> " );
+		
+		BufferedReader input = new BufferedReader ( new InputStreamReader ( System.in ) );
+		
+		String mode = new String ();
+		
+		try
+		{
+			mode = input.readLine ();
+			
+		}
+		catch ( Exception e )
+		{
+			
+		}
+		
+		
+		System.out.println ( "\nDigite o nome do arquivo a ser encriptado/decriptado:" );
+		System.out.print ( "> " );
+		
+		input = new BufferedReader ( new InputStreamReader ( System.in ) );
+		
+		String fileIn = new String();
+		
+		try
+		{
+			fileIn = input.readLine ();
+			
+		}
+		catch ( Exception e )
+		{
+			
+		}
+		
+		
+		System.out.println ( "\nDigite a chave:" );
+		System.out.print ( "> " );
+		
+		input = new BufferedReader ( new InputStreamReader ( System.in ) );
+		
+		String key = new String();
+		
+		try
+		{
+			key = input.readLine ();
+			
+		}
+		catch ( Exception e )
+		{
+			
+		}
+		
+		
+		System.out.println ( "Digite o nonce:" );
+		System.out.print ( "> " );
+		
+		input = new BufferedReader ( new InputStreamReader ( System.in ) );
+		
+		String nonce = new String();
+		
+		try
+		{
+			nonce = input.readLine ();
+			
+		}
+		catch ( Exception e )
+		{
+			
+		}
+		
+		
+		
+		System.out.println ( "\nDigite o nome do arquivo de saída:" );
+		System.out.print ( "> " );
+		
+		input = new BufferedReader ( new InputStreamReader ( System.in ) );
+		
+		String fileOut = new String();
+		
+		try
+		{
+			fileOut = input.readLine ();
+			
+		}
+		catch ( Exception e )
+		{
+			
+		}
+				
+		
+		Tweetcipher tc = new Tweetcipher ( key, nonce );
+		
+		if ( mode.equals ( "e" ) )
+		{
+			//String fileOut = "ciphered_" + fileIn;
+			
+			tc.encdec ( fileIn, fileOut, 'e' );
+			
+		}
+		else
+		{
+			//String fileOut = "deciphered_" + fileIn;
+			
+			tc.encdec ( fileIn, fileOut, 'd' );
+			
+		}
 		
 	}
 	
