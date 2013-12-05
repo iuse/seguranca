@@ -455,6 +455,8 @@ public class App
 		signed.write ( sigma[1].toString ( 16 ) );
 		
 		
+		System.out.println ( "\nArquivo " + mFile + " assinado com sucesso" );
+		
 		// Closes files
 		pk.close ();
 		signed.close ();
