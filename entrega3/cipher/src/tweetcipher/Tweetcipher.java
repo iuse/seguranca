@@ -10,13 +10,14 @@ import java.io.IOException;
  * Escola Politecnica da USP
  * PCS2582 - Seguranca da Informacao
  * 
- * Coursework #3: adaptation of "Tweetcipher" algorithm from C to Java.
+ * Coursework #3: Adaptation of "Tweetcipher" algorithm from C to Java.
  * (Ref: http://cybermashup.com/2013/06/12/tweetcipher-crypto-challenge/)
  * Has methods for file input and output.
  * 
  * @author Soon Hyung Kwon
  * @author Andre Hashimoto Oku
  */
+
 public class Tweetcipher {
 	
 	/**

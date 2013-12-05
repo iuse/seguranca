@@ -2,19 +2,28 @@
 package application;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.util.Random;
+import java.util.Scanner;
 
 import asymCipher.CramerShoup;
 import signature.Schnorr;
 import tweetcipher.Tweetcipher;
 
+
+/**
+ * Main application.
+ * 
+ * Implementation of a complete hybrid cipher.
+ * 
+ * @author Andre Hashimoto Oku
+ * @author Soon Hyung Kwon
+ */
 
 public class App
 {
@@ -27,6 +36,10 @@ public class App
 	private static BigInteger g2;
 	
 	
+	/**
+	 * Sets global predefined parametres
+	 * 
+	 */
 	public static void setPar ()
 	{
 		q = new BigInteger ( "2" );
@@ -60,6 +73,11 @@ public class App
 	}
 	
 	
+	/**
+	 * Option to generate key pair
+	 * 
+	 * @throws IOException
+	 */
 	private static void keyParGen () throws IOException
 	{
 		CramerShoup user = new CramerShoup ();
@@ -91,10 +109,12 @@ public class App
 		
 		
 		// Prints public key on terminal
+		/*
 		System.out.println ( "\nChave pública:" );
 		System.out.println ( "c:" + pk[0].toString ( 16 ) );
 		System.out.println ( "d:" + pk[1].toString ( 16 ) );
 		System.out.println ( "h:" + pk[2].toString ( 16 ) );
+		*/
 		
 		
 		// Generates text file with public key
@@ -106,9 +126,17 @@ public class App
 		
 		key.close ();
 		
+
+		System.out.println ( "\nArquivo 'pk.txt' gerado com sucesso" );
+		
 	}
 	
-	
+
+	/**
+	 * Combines CramerShoup and Tweetcipher to encrypt a file
+	 * 
+	 * @throws IOException
+	 */
 	private static void encryptFile () throws IOException
 	{
 		System.out.println ( "Digite o nome do arquivo a ser encriptado:" );
@@ -204,9 +232,17 @@ public class App
 		rpk.close ();
 		ct.close ();
 		
+		
+		System.out.println ( "\nArquivo " + fileIn + " encriptado com sucesso" );
+		
 	}
 	
 	
+	/**
+	 * Combines CramerShoup and Tweetcipher to decrypt a file
+	 * 
+	 * @throws IOException
+	 */
 	private static void decryptFile () throws IOException
 	{
 		System.out.println ( "Digite o nome do arquivo a ser decriptado:" );
@@ -323,10 +359,17 @@ public class App
 		// Closes files
 		ct.close ();
 		
+		
+		System.out.println ( "\nArquivo " + fileIn + " decriptado com sucesso" );
+		
 	}
 	
 	
-	private static void digitalSign ()
+	/**
+	 * Generates a digital signature for a message
+	 * @throws IOException 
+	 */
+	private static void digitalSign () throws IOException
 	{
 		Schnorr ds = new Schnorr ();
 		
@@ -335,16 +378,16 @@ public class App
 		
 		
 		// Message
-		System.out.println ( "Digite a mensagem a ser assinada:" );
+		System.out.println ( "Digite o nome do arquivo que contém a mensagem a ser assinada:" );
 		System.out.print ( "> " );
 		
 		BufferedReader input = new BufferedReader ( new InputStreamReader ( System.in ) );
 		
-		String m = new String();
+		String mFile = new String();
 		
 		try
 		{
-			m = input.readLine ();
+			mFile = input.readLine ();
 			
 		}
 		catch ( Exception e )
@@ -373,6 +416,8 @@ public class App
 		
 		
 		// Updates message
+		String m = new Scanner ( new File ( mFile ) ).useDelimiter ( "\\Z" ).next ();
+		
 		ds.update ( m );
 		
 		
@@ -385,16 +430,44 @@ public class App
 		
 		
 		// Prints public key and signed message on terminal
+		/*
 		System.out.println ( "\nChave Pública:" );
 		System.out.println ( key.toString ( 16 ) );
 		System.out.println ( "\nAssinatura digital:" );
 		System.out.println ( "h: " + sigma[0].toString ( 16 ) );
 		System.out.println ( "s: " + sigma[1].toString ( 16 ) );
+		*/
+		
+		// Opens files
+		// Contains user public key
+		FileWriter pk = new FileWriter ( "pk_sign.txt" );
+		
+		// Contains signed message
+		FileWriter signed = new FileWriter ( mFile + "_signed.txt" );
+		
+		
+		// Writes public key to file
+		pk.write ( key.toString ( 16 ) );
+		
+		
+		// Writes signed message to a file
+		signed.write ( sigma[0].toString ( 16 ) + "\n" );
+		signed.write ( sigma[1].toString ( 16 ) );
+		
+		
+		// Closes files
+		pk.close ();
+		signed.close ();
 		
 	}
 	
-	
-	private static void verifySign ()
+
+	/**
+	 * Verifies a digital signature
+	 * @throws IOException 
+	 * 
+	 */
+	private static void verifySign () throws IOException
 	{
 		Schnorr ds = new Schnorr ();
 		
@@ -403,16 +476,16 @@ public class App
 		
 		
 		// Message
-		System.out.println ( "Digite a mensagem:" );
+		System.out.println ( "Digite o nome do arquivo que contém a mensagem:" );
 		System.out.print ( "> " );
 		
 		BufferedReader input = new BufferedReader ( new InputStreamReader ( System.in ) );
 		
-		String m = new String();
+		String mFile = new String();
 		
 		try
 		{
-			m = input.readLine ();
+			mFile = input.readLine ();
 			
 		}
 		catch ( Exception e )
@@ -422,51 +495,35 @@ public class App
 		
 		
 		// Signature
-		System.out.println ( "\nDigite a assinatura a ser verificada:" );
-		System.out.print ( "h > " );
-		
-		input = new BufferedReader ( new InputStreamReader ( System.in ) );
-		
-		String h = new String();
-		
-		try
-		{
-			h = input.readLine ();
-			
-		}
-		catch ( Exception e )
-		{
-			
-		}
-		
-		System.out.print ( "\ns > " );
-		
-		input = new BufferedReader ( new InputStreamReader ( System.in ) );
-		
-		String s = new String();
-		
-		try
-		{
-			s = input.readLine ();
-			
-		}
-		catch ( Exception e )
-		{
-			
-		}
-		
-		
-		// Public key
-		System.out.println ( "\nDigite a chave pública:" );
+		System.out.println ( "\nDigite o nome do arquivo que contém a assinatura a ser verificada:" );
 		System.out.print ( "> " );
 		
 		input = new BufferedReader ( new InputStreamReader ( System.in ) );
 		
-		String key = new String();
+		String signFile = new String();
 		
 		try
 		{
-			key = input.readLine ();
+			signFile = input.readLine ();
+			
+		}
+		catch ( Exception e )
+		{
+			
+		}
+		
+				
+		// Public key
+		System.out.println ( "\nDigite o nome do arquivo que contém a chave pública:" );
+		System.out.print ( "> " );
+		
+		input = new BufferedReader ( new InputStreamReader ( System.in ) );
+		
+		String keyFile = new String();
+		
+		try
+		{
+			keyFile = input.readLine ();
 			
 		}
 		catch ( Exception e )
@@ -476,19 +533,67 @@ public class App
 		
 		
 		// Updates message
+		String m = new Scanner ( new File ( mFile ) ).useDelimiter ( "\\Z" ).next ();
+		
 		ds.update ( m );
 		
-		BigInteger[] sigma = { new BigInteger ( h, 16 ), new BigInteger ( s, 16 ) };
+		
+		// Reads signed message from file
+		FileInputStream sign = new FileInputStream ( signFile );
+		
+		BigInteger[] sigma = new BigInteger[2];
+		
+		BufferedReader signBuffer = new BufferedReader ( new InputStreamReader ( sign ) );
+		
+		String signLine;
+		
+		for ( int k = 0; ( signLine = signBuffer.readLine () ) != null; k++ )
+		{
+			sigma[k] = new BigInteger ( signLine, 16 );
+			
+			//System.out.println ( sigma[k].toString ( 16 ) );
+		
+		}
+		
+		
+		// Reads public key from file
+		FileInputStream pk = new FileInputStream ( keyFile );
+		
+		BufferedReader keyBuffer = new BufferedReader ( new InputStreamReader ( pk ) );
+		
+		String key = keyBuffer.readLine ();
+		
+		//System.out.println ( key );
 		
 		
 		// Verifies message
 		boolean valid = ds.verify ( sigma, new BigInteger ( key, 16 ) );
 		
-		System.out.println ( valid );
+		if ( valid )
+		{
+			System.out.println ( "\nAssinatura válida" );
+			
+		}
+		else
+		{
+			System.out.println ( "\nAssinatura inválida" );
+			
+		}
+		
+		
+		// Closes files
+		sign.close ();
+		pk.close ();
+		
 		
 	}
 	
 	
+	/**
+	 * Runs only Tweetcipher to encrypt a message
+	 * 
+	 * @throws IOException
+	 */
 	private static void tc () throws IOException
 	{
 		System.out.println ( "Selecione o modo ('e' para encriptar, 'd' para decriptar):" );
@@ -599,9 +704,18 @@ public class App
 			
 		}
 		
+		
+		System.out.println ( "\nArquivo " + " encriptado/decriptado com sucesso" );
+		
 	}
 	
 	
+	/**
+	 * Main loop of the application
+	 * 
+	 * @param args
+	 * @throws IOException
+	 */
 	public static void main ( String[] args ) throws IOException
 	{
 		System.out.println ( "PCS2582 - Segurança da Informação" );

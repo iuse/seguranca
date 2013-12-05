@@ -1,3 +1,4 @@
+
 package asymCipher;
 
 import java.math.BigInteger;
@@ -6,6 +7,16 @@ import java.util.Random;
 import blake2bjava.Blake2b;
 import utility.Utility;
 
+
+/**
+ * Cramer-Shoup algorithm.
+ * 
+ * Implementation of the Cramer-Shoup algorithm for asymmetric ciphering.
+ * This class has methods to generate a key pair, encrypt, and decrypt the symmetric key.
+ * 
+ * @author Andre Hashimoto Oku
+ * @author Soon Hyung Kwon
+ */
 
 public class CramerShoup
 {
@@ -28,7 +39,15 @@ public class CramerShoup
 	private BigInteger g2;
 	
 	
-	// Sets parametres
+	/**
+	 * Sets parametres used in calculation
+	 * 
+	 * @param p
+	 * @param q
+	 * @param g
+	 * @param g1
+	 * @param g2
+	 */
 	public void config ( BigInteger p, BigInteger q, BigInteger g, BigInteger g1, BigInteger g2 )
 	{
 		this.p = p;
@@ -39,7 +58,12 @@ public class CramerShoup
 	}
 	
 	
-	// Generates key pair
+	/**
+	 * Generates key pair from a user-defined password
+	 * 
+	 * @param pw User-defined password
+	 * @return Returns the public key
+	 */
 	public BigInteger[] keyPairGen ( String pw )
 	{
 		// Null byte
@@ -93,7 +117,13 @@ public class CramerShoup
 	}
 	
 	
-	// Encryption
+	/**
+	 * Encrypts the symmetric key using the recipient's public key
+	 *  
+	 * @param pk Recipient's public key
+	 * @param k Symmetric key
+	 * @return Returns the ciphertext
+	 */
 	public BigInteger[] encrypt ( BigInteger[] pk, byte[] k )
 	{
 		// Null byte
@@ -140,7 +170,12 @@ public class CramerShoup
 	}
 	
 	
-	// Decryption
+	/**
+	 * Decrypts the symmetric key from a ciphertext
+	 * 
+	 * @param C Ciphertext
+	 * @return Returns the symmetric key as a byte array
+	 */
 	public byte[] decrypt ( BigInteger[] C )
 	{
 		// Null byte

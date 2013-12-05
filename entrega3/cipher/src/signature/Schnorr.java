@@ -7,15 +7,34 @@ import blake2bjava.Blake2b;
 import utility.Utility;
 
 
+/**
+ * Schnorr algorithm.
+ * 
+ * Implementation of the Schnorr algorithm for digital signature.
+ * This class has methods to generate a key pair, sign, and verify signatures.
+ * 
+ * @author Andre Hashimoto Oku
+ * @author Soon Hyung Kwon
+ */
+
 public class Schnorr
 {
-	// Private key (mod q)
+	/**
+	 * Private key (mod q)
+	 * 
+	 */
 	private BigInteger x;
 	
-	// Public key (mod p)
+	/**
+	 * Public key (mod p)
+	 * 
+	 */
 	private BigInteger y;
 	
-	// Message
+	/**
+	 * Message
+	 * 
+	 */
 	private byte[] m;
 	
 	// Parametres
@@ -24,7 +43,13 @@ public class Schnorr
 	private BigInteger g;
 	
 	
-	// Sets parametres
+	/**
+	 * Sets parametres used in calculation
+	 * 
+	 * @param p
+	 * @param q
+	 * @param g
+	 */
 	public void config ( BigInteger p, BigInteger q, BigInteger g )
 	{
 		this.p = p;
@@ -34,7 +59,11 @@ public class Schnorr
 	}
 	
 	
-	// Updates message
+	/**
+	 * Updates message
+	 *  
+	 * @param M Message
+	 */
 	public void update ( String M )
 	{
 		m = M.getBytes ();
@@ -42,7 +71,12 @@ public class Schnorr
 	}
 	
 	
-	// Generates key pair
+	/**
+	 * Generates key pair from a user-defined password
+	 * 
+	 * @param pw User-defined password
+	 * @return Returns the public key
+	 */
 	public BigInteger keyPairGen ( String pw )
 	{
 		// Null byte
@@ -65,7 +99,11 @@ public class Schnorr
 		
 	}
 	
-	// Sign
+	/**
+	 * Signs message
+	 * 
+	 * @return Returns the signed message
+	 */
 	public BigInteger[] sign ()
 	{
 		// Null byte
@@ -95,7 +133,13 @@ public class Schnorr
 	}
 	
 	
-	// Verify
+	/**
+	 * Compares the signed message with the raw message
+	 * 
+	 * @param sigma Signed message
+	 * @param key Sender public key
+	 * @return Returns true if the signature is valid
+	 */
 	public boolean verify ( BigInteger[] sigma, BigInteger key )
 	{
 		// Null byte
